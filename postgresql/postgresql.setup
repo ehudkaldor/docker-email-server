@@ -1,0 +1,95 @@
+#!/usr/bin/with-contenv sh
+chown -R postgres "$PGDATA"
+
+if [ -z "$(ls -A "$PGDATA")" ]; then
+    gosu postgres initdb
+    sed -ri "s/^#(listen_addresses\s*=\s*)\S+/\1'*'/" "$PGDATA"/postgresql.conf
+
+    : ${POSTGRES_USER:="postgres"}
+    : ${POSTGRES_DB:=$POSTGRES_USER}
+
+    if [ "$POSTGRES_PASSWORD" ]; then
+      pass="PASSWORD '$POSTGRES_PASSWORD'"
+      authMethod=md5
+    else
+      echo "==============================="
+      echo "!!! Use \$POSTGRES_PASSWORD env var to secure your database !!!"
+      echo "==============================="
+      pass=
+      authMethod=trust
+    fi
+    echo
+
+# tighten database server permissions
+#    echo "REVOKE CREATE ON SCHEMA public FROM PUBLIC;" | gosu postgres postgres --single -jE
+#    echo "REVOKE USAGE ON SCHEMA public FROM PUBLIC;" | gosu postgres postgres --single -jE
+#    echo "GRANT CREATE ON SCHEMA public TO postgres;" | gosu postgres postgres --single -jE
+#    echo "GRANT USAGE ON SCHEMA public TO postgres;" | gosu postgres postgres --single -jE
+
+
+ #   if [ "$POSTGRES_DB" != 'postgres' ]; then
+ #     for dbname in $POSTGRES_DB; do
+ #       createUser="CREATE USER $dbname WITH PASSWORD '$dbname';"
+ #       createSql="CREATE DATABASE $dbname;"
+ #       grantAll="GRANT ALL PRIVILEGES ON DATABASE $dbname TO $dbname;"
+ #       echo $createUser | gosu postgres postgres --single -jE
+ #       echo $createSql | gosu postgres postgres --single -jE
+ #       echo $grantAll | gosu postgres postgres --single -jE
+ #       echo
+ #     done
+ #   fi
+
+    if [ "$POSTGRES_USER" != 'postgres' ]; then
+      op=CREATE
+    else
+      op=ALTER
+    fi
+
+    userSql="$op USER $POSTGRES_USER WITH SUPERUSER $pass;"
+    echo $userSql | gosu postgres postgres --single -jE
+    echo
+
+    # replace variable names in SQL scripts with provided values
+    POSTFIX_USER=${POSTFIX_USER:-}
+    if [[ -z ${POSTFIX_USER} ]]; then
+        POSTFIX_USER=postfix
+    fi
+
+    POSTFIX_PASS=${POSTFIX_PASS:-}
+    if [[ -z ${POSTFIX_PASS} ]]; then
+        POSTFIX_PASS=password
+    fi
+
+    POSTFIX_DB=${POSTFIX_DB:-}
+    if [[ -z ${POSTFIX_DB} ]]; then
+        POSTFIX_DB=database
+    fi
+
+    sed -i "s/##POSTFIX_USER##/$POSTFIX_USER/g" /initdb.d/*
+    sed -i "s/##POSTFIX_PASS##/$POSTFIX_PASS/g" /initdb.d/*
+    sed -i "s/##POSTFIX_DB##/$POSTFIX_DB/g" /initdb.d/*
+
+
+    # internal start of server in order to allow set-up using psql-client
+    # does not listen on TCP/IP and waits until start finishes
+    gosu postgres pg_ctl -D "$PGDATA" \
+        -o "-c listen_addresses=''" \
+        -w start
+
+    echo
+    for f in /initdb.d/*; do
+        case "$f" in
+            *.sh)  echo "$0: running $f"; . "$f" ;;
+#            *.sql) echo "$0: running $f"; psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" < "$f" && echo ;;
+            *.sql) echo "$0: running $f"; psql --username "$POSTGRES_USER" -e < "$f" && echo ;;
+            *)     echo "$0: ignoring $f" ;;
+        esac
+        echo
+    done
+
+    gosu postgres pg_ctl -D "$PGDATA" -m fast -w stop
+
+    { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
+fi
+
+#exec gosu postgres "$@"

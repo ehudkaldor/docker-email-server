@@ -1,0 +1,5 @@
+user = ##DOVECOT_PGSQL_USER##
+password = ##DOVECOT_PGSQL_PASS##
+hosts = ##PGSQL_HOST##
+dbname = ##DOVECOT_SQL_USER##
+query =  SELECT 1 FROM users WHERE email LIKE '%s' 

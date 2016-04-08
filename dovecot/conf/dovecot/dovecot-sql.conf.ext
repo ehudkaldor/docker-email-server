@@ -1,0 +1,5 @@
+driver = pgsql
+connect = host=##PGSQL_HOST## dbname=##POSTFIX_PGSQL_DB## user=##POSTFIX_PGSQL_USER## password=##POSTFIX_PGSQL_PASS##
+default_pass_scheme = SHA512-CRYPT
+password_query = SELECT email as user, password, 'maildir:/home/mail/'||maildir as userdb_mail FROM users WHERE email = '%u'
+user_query = SELECT '/home/mail/'||maildir as home, uid, gid, email FROM users WHERE email = '%u'

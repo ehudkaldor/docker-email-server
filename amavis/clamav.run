@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+./setup
+
+exec sleep 10

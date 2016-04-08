@@ -1,0 +1,11 @@
+#!/usr/bin/with-contenv sh
+#fdmove -c 2 1
+#s6-envdir env
+#import PGDATA
+
+#./setup
+
+echo "Starting PostgreSQL server..."
+#exec su postgres -c 'postgres -D /etc/postgresql/ -i -o -e'
+#exec gosu postgres postgres
+s6-setuidgid postgres postgres

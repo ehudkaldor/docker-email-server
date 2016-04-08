@@ -1,0 +1,8 @@
+user = ##POSTFIX_PGSQL_USER##
+password = ##POSTFIX_PGSQL_PASS##
+hosts = ##PGSQL_HOST##
+dbname = ##POSTFIX_PGSQL_DB##
+table = users
+select_field = *
+where_field = email
+#query =  SELECT 1 FROM users WHERE email LIKE '%s' 

@@ -1,0 +1,167 @@
+#!/usr/bin/with-contenv sh
+logutil-service -f /var/log/
+
+# Environment variables
+export PGSQL_HOST 
+export DOVECOT_HOST
+export SPAMASSASSIN_HOST
+export CLAMAV_HOST
+
+export POSTFIX_PGSQL_USER
+export POSTFIX_PGSQL_PASS
+export POSTFIX_PGSQL_DB
+
+#export DOVECOT_PGSQL_USER
+#export DOVECOT_PGSQL_PASS
+#export DOVECOT_PGSQL_DB
+
+
+export ADMIN_EMAIL
+export SMTP_HOSTNAME 
+export SMTP_DOMAIN
+
+export VMAIL_UID
+export VMAIL_GID
+
+export SKIP_POSTFIX_SETUP
+
+if [[ -f /private/vars.sh ]]; then
+    source /private/vars.sh
+fi
+
+SKIP_POSTFIX_SETUP=${SKIP_POSTFIX_SETUP:-}
+
+if [[ -z $SKIP_POSTFIX_SETUP ]]; then
+    echo "copying config files from /opt/postfix.default/ to /etc/postfix/"
+    rsync -a /opt/postfix.default/ /etc/postfix/
+
+    echo "checking parameters"
+    ADMIN_EMAIL=${ADMIN_EMAIL}
+    if [[ -z ${ADMIN_EMAIL} ]]; then
+        echo "WARN: ADMIN_EMAIL not found. using default"
+        ADMIN_EMAIL="admin@domain.com"
+    fi
+    echo "ADMIN_EMAIL set to $ADMIN_EMAIL"
+
+    SMTP_DOMAIN=${SMTP_DOMAIN}
+    if [[ -z ${SMTP_DOMAIN} ]]; then
+        echo "WARN: SMTP_DOMAIN not found. using default"
+        SMTP_DOMAIN=$(echo $ADMIN_EMAIL | sed 's/.*@//')
+    fi
+    echo "SMTP_DOMAIN set to $SMTP_DOMAIN"
+
+    POSTFIX_PGSQL_USER=${POSTFIX_PGSQL_USER:-}
+    if [[ -z ${POSTFIX_PGSQL_USER} ]]; then
+        echo "WARN: POSTFIX_PGSQL_USER not found. using default"
+        POSTFIX_PGSQL_USER=user
+    fi
+    echo "POSTFIX_PGSQL_USER set to $POSTFIX_PGSQL_USER"
+
+    POSTFIX_PGSQL_PASS=${POSTFIX_PGSQL_PASS:-}
+    if [[ -z ${POSTFIX_PGSQL_PASS} ]]; then
+        echo "WARN: POSTFIX_PGSQL_PASS not found. using default"
+        POSTFIX_PGSQL_PASS=password
+    fi
+    echo "POSTFIX_PGSQL_PASS set"
+
+    POSTFIX_PGSQL_DB=${POSTFIX_PGSQL_DB:-}
+    if [[ -z ${POSTFIX_PGSQL_DB} ]]; then
+        echo "WARN: POSTFIX_PGSQL_DB not found. using default"
+        POSTFIX_PGSQL_DB=db
+    fi
+    echo "POSTFIX_PGSQL_DB set to $POSTFIX_PGSQL_DB"
+
+    SMTP_HOSTNAME=${SMTP_HOSTNAME}
+    if [[ -z ${SMTP_HOSTNAME} ]]; then
+        echo "WARN: SMTP_HOSTNAME not found. using default"
+        SMTP_HOSTNAME=smtp.$SMTP_DOMAIN
+    fi
+    echo "SMTP_HOSTNAME set to $SMTP_HOSTNAME"
+
+    PGSQL_HOST=${PGSQL_HOST:-}
+    if [[ -z ${PGSQL_HOST} ]]; then
+        echo "WARN: PGSQL_HOST not found. using default"
+        PGSQL_HOST=pgsql.$SMTP_DOMAIN
+    fi
+    echo "PGSQL_HOST set to $PGSQL_HOST"
+
+    DOVECOT_HOST=${DOVECOT_HOST:-}
+    if [[ -z ${DOVECOT_HOST} ]]; then
+        echo "WARN: DOVECOT_HOST not found. using default"
+        DOVECOT_HOST=dovecot.$SMTP_DOMAIN
+    fi
+    echo "DOVECOT_HOST set to $DOVECOT_HOST"
+
+    SPAMASSASSIN_HOST=${SPAMASSASSIN_HOST:-}
+    if [[ -z ${SPAMASSASSIN_HOST} ]]; then
+        echo "WARN: SPAMASSASSIN_HOST not found. using default"
+        SPAMASSASSIN_HOST=spamassassin.$SMTP_DOMAIN
+    fi
+    echo "SPAMASSASSIN_HOST set to $SPAMASSASSIN_HOST"
+
+    CLAMAV_HOST=${CLAMAV_HOST:-}
+    if [[ -z ${CLAMAV_HOST} ]]; then
+        echo "WARN: CLAMAV_HOST not found. using default"
+        CLAMAV_HOST=clamav.$SMTP_DOMAIN
+    fi
+    echo "CLAMAV_HOST set to $CLAMAV_HOST"
+
+
+    VMAIL_UID=`id -u vmail`
+    VMAIL_GID=`id -g vmail`
+
+    sed -i "s/##ADMIN_EMAIL##/$ADMIN_EMAIL/g" /etc/postfix/main.cf
+    sed -i "s/##SPAMASSASSIN_HOST##/$SPAMASSASSIN_HOST/g" /etc/postfix/main.cf
+    sed -i "s/##CLAMAV_HOST##/$CLAMAV_HOST/g" /etc/postfix/main.cf
+    sed -i "s/##SMTP_HOSTNAME##/$SMTP_HOSTNAME/g" /etc/postfix/main.cf
+    sed -i "s/##SMTP_DOMAIN##/$SMTP_DOMAIN/g" /etc/postfix/main.cf
+    sed -i "s/##DOVECOT_HOST##/$DOVECOT_HOST/g" /etc/postfix/main.cf
+    sed -i "s/##VMAIL_UID##/$VMAIL_UID/g" /etc/postfix/main.cf
+    sed -i "s/##VMAIL_GID##/$VMAIL_GID/g" /etc/postfix/main.cf
+
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/virtual-mailbox-domains.cf
+
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/virtual-mailbox-maps.cf
+
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/virtual-alias-maps.cf
+
+    sed -i "s/##ADMIN_EMAIL##/$ADMIN_EMAIL/g" /initdb.d/*
+    sed -i "s/##SMTP_DOMAIN##/$SMTP_DOMAIN/g" /initdb.d/*
+
+fi
+
+    for f in /initdb.d/*; do
+        case "$f" in
+    #        *.sql) echo "$0: running $f"; psql -h $PGSQL_HOST -U "$POSTFIX_PGSQL_USER" -e < "$f" && echo ;;
+            *)     echo "$0: ignoring $f" ;;
+        esac
+        echo
+    done
+
+
+mkdir -p /private/ssl
+if [[ ! -f /private/ssl/ssl_certificate.pem ]]; then
+    DOMAIN=$(echo $ADMIN_EMAIL | sed 's/.*@//')
+    openssl req -new -newkey rsa:2048 -days 30 -nodes -x509 \
+    -keyout /private/ssl/ssl_private_key.pem \
+    -out /private/ssl/ssl_certificate.pem \
+    -subj '/O=Company/OU=Department/CN=www.'$DOMAIN
+fi

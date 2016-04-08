@@ -1,0 +1,109 @@
+#!/usr/bin/with-contenv sh
+
+# Environment variables
+export PGSQL_HOST 
+export DOVECOT_PGSQL_USER
+export DOVECOT_PGSQL_PASS
+export POSTFIX_PGSQL_DB
+
+export SPAMASSASSIN_HOST
+
+export ADMIN_EMAIL
+export SMTP_HOSTNAME 
+export SMTP_DOMAIN
+export DOVECOT_HOST
+
+export SKIP_DB_SETUP
+export SKIP_DOVECOT_SETUP
+
+mkdir -p /private/ssl/
+
+if [[ -f /private/vars.sh ]]; then
+    source /private/vars.sh
+fi
+
+SKIP_DOVECOT_SETUP=${SKIP_DOVECOT_SETUP:-}
+
+if [[ -z $SKIP_DOVECOT_SETUP ]]; then
+    echo "copying config files from /opt/dovecot.default/ to /etc/dovecot/"
+    rsync -a /opt/dovecot.default/ /etc/dovecot/
+    echo "running sieve script"
+    sievec /etc/dovecot/sieve-spam.sieve
+
+    echo "checking parameters"
+    ADMIN_EMAIL=${ADMIN_EMAIL}
+    if [[ -z ${ADMIN_EMAIL} ]]; then
+        echo "WARN: ADMIN_EMAIL not found. using default"
+        ADMIN_EMAIL="admin@domain.com"
+    fi
+    echo "ADMIN_EMAIL set to $ADMIN_EMAIL"
+
+    SMTP_DOMAIN=${SMTP_DOMAIN}
+    if [[ -z ${SMTP_DOMAIN} ]]; then
+        echo "WARN: SMTP_DOMAIN not found. using default"
+        SMTP_DOMAIN=$(echo $ADMIN_EMAIL | sed 's/.*@//')
+    fi
+    echo "SMTP_DOMAIN set to $SMTP_DOMAIN"
+
+    DOVECOT_HOST=${DOVECOT_HOST:-}
+    if [[ -z ${DOVECOT_HOST} ]]; then
+      echo "WARN: DOVECOT_HOST not found. using default"
+      DOVECOT_HOST=dovecot.$(echo $ADMIN_EMAIL | sed 's/.*@//')
+    fi
+    echo "DOVECOT_HOST set to $DOVECOT_HOST"
+
+    if [[ -z $SKIP_DB_SETUP ]]; then
+      echo "setting up Postgresql database access parameters"
+      PGSQL_HOST=${PGSQL_HOST:-}
+      if [[ -z ${PGSQL_HOST} ]]; then
+          echo "WARN: PGSQL_HOST not found. using default"
+          PGSQL_HOST=pgsql.$(echo $ADMIN_EMAIL | sed 's/.*@//')
+      fi
+      echo "Postgresql hostname set to $PGSQL_HOST"
+
+      if [[ -n $PGSQL_HOST ]]; then
+          DOVECOT_PGSQL_USER=${DOVECOT_PGSQL_USER:-}
+          DOVECOT_PGSQL_PASS=${DOVECOT_PGSQL_PASS:-}
+      fi
+      if [[ -z $DOVECOT_PGSQL_USER ]]; then
+        echo "ERROR: DOVECOT_PGSQL_USER not found!"
+      else
+        echo "Postgresql username set to $DOVECOT_PGSQL_USER"
+      fi
+      if [[ -z $DOVECOT_PGSQL_PASS ]]; then
+        echo "ERROR: DOVECOT_PGSQL_PASS not found!"
+      else
+        echo "Postgresql password set"
+      fi
+    fi
+
+    echo "replacing placeholders in /etc/dovecot/conf.d/10-auth.conf"
+    sed -i "s/#*\(\!include auth-system.conf.ext\)/#\1/"  /etc/dovecot/conf.d/10-auth.conf
+    sed -i "s/#\(\!include auth-sql.conf.ext\)/\1/"  /etc/dovecot/conf.d/10-auth.conf
+    echo "replacing placeholders in /etc/dovecot/dovecot-sql.conf.ext"
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/dovecot/dovecot-sql.conf.ext
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/dovecot/dovecot-sql.conf.ext
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/dovecot/dovecot-sql.conf.ext
+    echo "chmoding /etc/dovecot/dovecot-sql.conf.ext to 0600"
+    chmod 0600 /etc/dovecot/dovecot-sql.conf.ext
+    echo "replacing placeholders in /etc/dovecot/conf.d/15-lda.conf"
+    sed -i "s/##ADMIN_EMAIL##/$ADMIN_EMAIL/g" /etc/dovecot/conf.d/15-lda.conf
+
+    echo "generating SSL certificate"
+    mkdir -p /private/ssl
+    if [[ ! -f /private/ssl/ssl_certificate.pem ]]; then
+        DOMAIN=$(echo $ADMIN_EMAIL | sed 's/.*@//')
+        openssl req -new -newkey rsa:2048 -days 30 -nodes -x509 \
+        -keyout /private/ssl/ssl_private_key.pem \
+        -out /private/ssl/ssl_certificate.pem \
+        -subj '/O=Company/OU=Department/CN=www.'$DOMAIN
+    fi
+    echo "configuration done"
+    echo
+
+    chown -R mail:dovecot /etc/dovecot
+    chmod -R o-rwx /etc/dovecot
+
+fi
+
+

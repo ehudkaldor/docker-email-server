@@ -1,0 +1,37 @@
+version: '2'
+#networks:
+#  frontend:
+#    driver: overlay
+#  backend:
+#    driver: overlay
+services:
+#  postgresql:
+#    image: ehudkaldor/postgresql:latest
+#    environment:
+#      - POSTGRES_NAME=maildb.connected.us.com
+#      - POSTGRES_USER=postfix
+#      - POSTGRES_PASS=password
+#    restart: on-failure
+#    networks:
+#      - backend
+  postfix:
+    image: ehudkaldor/mail-server:latest
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "143:143"
+      - "993:993"
+    environment:
+      - ADMIN_EMAIL           =    root@connected.us.com
+      - SMTP_HOSTNAME         =    email.connected.us.com
+      - DOVECOT_HOST          =    email.connected.us.com
+      - SPAMASSASSIN_HOST     =    email.connected.us.com
+      - PGSQL_HOST            =    maildb.connected.us.com
+      - SMTP_DOMAIN           =    connected.us.com
+      - POSTGRES_USER         =    postfix
+      - DOVECOT_PGSQL_USER    =    dovecot
+      - DOVECOT_PGSQL_PASS    =    password
+#    networks:
+#      - backend
+#      - frontend
