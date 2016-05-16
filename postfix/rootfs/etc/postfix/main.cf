@@ -179,9 +179,14 @@ inet_interfaces = all
 # In the left-hand side, specify a bare username, an @domain.tld
 # wild-card, or specify a user@domain.tld address.
 # 
-#local_recipient_maps = unix:passwd.byname $alias_maps
-#local_recipient_maps = proxy:unix:passwd.byname $alias_maps
-#local_recipient_maps =
+local_recipient_maps =
+virtual_uid_maps = static:##VMAIL_UID##
+virtual_gid_maps = static:##VMAIL_GID##
+transport_maps = pgsql:/etc/postfix/pgsql/transport.cf
+virtual_mailbox_base = /var/spool/mail/vhosts
+virtual_mailbox_maps = pgsql:/etc/postfix/pgsql/mailboxes.cf
+virtual_maps = pgsql:/etc/postfix/pgsql/virtual.cf
+mydestination = $mydomain, $myhostname
 
 # The unknown_local_recipient_reject_code specifies the SMTP server
 # response code when a recipient domain matches $mydestination or
@@ -641,3 +646,5 @@ shlib_directory = /usr/lib/postfix
 smtpd_tls_cert_file=/private/ssl/ssl_certificate.pem
 smtpd_tls_key_file=/private/ssl/ssl_private_key.pem
 
+# spam/virus checking with Amavis
+content_filter = amavisfeed:[##AMAVIS_HOST##]:10024

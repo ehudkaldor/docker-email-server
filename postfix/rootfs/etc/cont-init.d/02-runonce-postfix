@@ -119,29 +119,29 @@ if [[ -z $SKIP_POSTFIX_SETUP ]]; then
     sed -i "s/##VMAIL_UID##/$VMAIL_UID/g" /etc/postfix/main.cf
     sed -i "s/##VMAIL_GID##/$VMAIL_GID/g" /etc/postfix/main.cf
 
-    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/virtual-mailbox-domains.cf
-    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/virtual-mailbox-domains.cf
-    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-domains.cf
-    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/virtual-mailbox-domains.cf
-    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/virtual-mailbox-domains.cf
-    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-domains.cf
-    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/virtual-mailbox-domains.cf
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/pgsql/mailboxes.cf
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/pgsql/mailboxes.cf
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/pgsql/mailboxes.cf
+    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/pgsql/mailboxes.cf
+    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/pgsql/mailboxes.cf
+    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/pgsql/mailboxes.cf
+    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/pgsql/mailboxes.cf
 
-    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/virtual-mailbox-maps.cf
-    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/virtual-mailbox-maps.cf
-    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-maps.cf
-    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/virtual-mailbox-maps.cf
-    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/virtual-mailbox-maps.cf
-    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/virtual-mailbox-maps.cf
-    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/virtual-mailbox-maps.cf
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/pgsql/transport.cf
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/pgsql/transport.cf
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/pgsql/transport.cf
+    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/pgsql/transport.cf
+    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/pgsql/transport.cf
+    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/pgsql/transport.cf
+    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/pgsql/transport.cf
 
-    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/virtual-alias-maps.cf
-    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/virtual-alias-maps.cf
-    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/virtual-alias-maps.cf
-    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/virtual-alias-maps.cf
-    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/virtual-alias-maps.cf
-    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/virtual-alias-maps.cf
-    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/virtual-alias-maps.cf
+    sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/pgsql/virtual.cf
+    sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/pgsql/virtual.cf
+    sed -i "s/##DOVECOT_PGSQL_PASS##/$DOVECOT_PGSQL_PASS/g" /etc/postfix/pgsql/virtual.cf
+    sed -i "s/##DOVECOT_PGSQL_DB##/$DOVECOT_PGSQL_DB/g" /etc/postfix/pgsql/virtual.cf
+    sed -i "s/##POSTFIX_PGSQL_USER##/$POSTFIX_PGSQL_USER/g" /etc/postfix/pgsql/virtual.cf
+    sed -i "s/##POSTFIX_PGSQL_PASS##/$POSTFIX_PGSQL_PASS/g" /etc/postfix/pgsql/virtual.cf
+    sed -i "s/##POSTFIX_PGSQL_DB##/$POSTFIX_PGSQL_DB/g" /etc/postfix/pgsql/virtual.cf
 
     sed -i "s/##ADMIN_EMAIL##/$ADMIN_EMAIL/g" /initdb.d/*
     sed -i "s/##SMTP_DOMAIN##/$SMTP_DOMAIN/g" /initdb.d/*

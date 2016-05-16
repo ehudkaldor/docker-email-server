@@ -18,6 +18,10 @@ CREATE TABLE transports (domain TEXT NOT NULL, gid INTEGER UNIQUE NOT NULL, tran
 CREATE TABLE users (email TEXT NOT NULL, domain TEXT NOT NULL references transports(domain), password TEXT NOT NULL, realname TEXT, maildir TEXT NOT NULL, created TIMESTAMP WITH TIME ZONE DEFAULT now(), PRIMARY KEY (email));
 CREATE TABLE aliases (source TEXT NOT NULL, destination TEXT NOT NULL, PRIMARY KEY (source));
 
+ALTER DATABASE ##MAIL_DB## OWNER TO ##MAILREADER_USER##;
+ALTER TABLE transports OWNER TO ##MAILREADER_USER##;
+ALTER TABLE users OWNER TO ##MAILREADER_USER##;
+ALTER TABLE aliases OWNER TO ##MAILREADER_USER##;
 -- Grant read permissions to DB 'mail' to postfix user
 -- GRANT USAGE ON SCHEMA public to ##MAILREADER_USER##; 
 GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO ##MAILREADER_USER##;

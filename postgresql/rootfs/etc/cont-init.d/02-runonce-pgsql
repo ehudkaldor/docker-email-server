@@ -87,7 +87,9 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
     echo "SMTP_HOSTNAME set to $SMTP_HOSTNAME"
 
     sed -i "s/##DOVECOT_HOST##/$DOVECOT_HOST/g" "$PGDATA/"pg_hba.conf
+    sed -i "s/##MAILREADER_USER##/$MAILREADER_USER/g" "$PGDATA/"pg_hba.conf
     sed -i "s/##SMTP_HOSTNAME##/$SMTP_HOSTNAME/g" "$PGDATA/"pg_hba.conf
+    sed -i "s/##MAIL_DB##/$MAIL_DB/g" "$PGDATA/"pg_hba.conf
 
 
     sed -i "s/##MAILREADER_USER##/$MAILREADER_USER/g" /initdb.d/*
@@ -118,4 +120,4 @@ if [ -z "$(ls -A "$PGDATA")" ]; then
     { echo; echo "host all all 0.0.0.0/0 $authMethod"; } >> "$PGDATA"/pg_hba.conf
 
 
-fi'
+fi
