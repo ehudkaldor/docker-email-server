@@ -25,7 +25,7 @@ RUN 		apk add --update \
 
 #RUN		mkdir -p /etc/services.d/postfix
 
-EXPOSE		25 465 587 143 993
+EXPOSE		25 465 587 10025
 
 #RUN		mkdir /var/spool/mail
 RUN		mkdir -p /var/spool/mail/vhosts
