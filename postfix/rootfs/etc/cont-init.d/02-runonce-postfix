@@ -4,8 +4,9 @@
 # Environment variables
 export PGSQL_HOST 
 export DOVECOT_HOST
-export SPAMASSASSIN_HOST
-export CLAMAV_HOST
+#export SPAMASSASSIN_HOST
+#export CLAMAV_HOST
+export CONTENT_FILTER_HOST
 
 export POSTFIX_PGSQL_USER
 export POSTFIX_PGSQL_PASS
@@ -92,19 +93,19 @@ if [[ -z $SKIP_POSTFIX_SETUP ]]; then
     fi
     echo "DOVECOT_HOST set to $DOVECOT_HOST"
 
-    SPAMASSASSIN_HOST=${SPAMASSASSIN_HOST:-}
-    if [[ -z ${SPAMASSASSIN_HOST} ]]; then
-        echo "WARN: SPAMASSASSIN_HOST not found. using default"
-        SPAMASSASSIN_HOST=spamassassin.$SMTP_DOMAIN
-    fi
-    echo "SPAMASSASSIN_HOST set to $SPAMASSASSIN_HOST"
+#    SPAMASSASSIN_HOST=${SPAMASSASSIN_HOST:-}
+#    if [[ -z ${SPAMASSASSIN_HOST} ]]; then
+#        echo "WARN: SPAMASSASSIN_HOST not found. using default"
+#        SPAMASSASSIN_HOST=spamassassin.$SMTP_DOMAIN
+#    fi
+#    echo "SPAMASSASSIN_HOST set to $SPAMASSASSIN_HOST"
 
-    CLAMAV_HOST=${CLAMAV_HOST:-}
-    if [[ -z ${CLAMAV_HOST} ]]; then
-        echo "WARN: CLAMAV_HOST not found. using default"
-        CLAMAV_HOST=clamav.$SMTP_DOMAIN
+    CONTENT_FILTER_HOST=${CLAMAV_HOST:-}
+    if [[ -z ${CONTENT_FILTER_HOST} ]]; then
+        echo "WARN: CONTENT_FILTER_HOST not found. using default"
+        CONTENT_FILTER_HOST=filter.$SMTP_DOMAIN
     fi
-    echo "CLAMAV_HOST set to $CLAMAV_HOST"
+    echo "CONTENT_FILTER_HOST set to $CONTENT_FILTER_HOST"
 
 
     VMAIL_UID=`id -u vmail`
@@ -118,6 +119,7 @@ if [[ -z $SKIP_POSTFIX_SETUP ]]; then
     sed -i "s/##DOVECOT_HOST##/$DOVECOT_HOST/g" /etc/postfix/main.cf
     sed -i "s/##VMAIL_UID##/$VMAIL_UID/g" /etc/postfix/main.cf
     sed -i "s/##VMAIL_GID##/$VMAIL_GID/g" /etc/postfix/main.cf
+    sed -i "s/##CONTENT_FILTER_HOST##/$CONTENT_FILTER_HOST/g" /etc/postfix/main.cf
 
     sed -i "s/##PGSQL_HOST##/$PGSQL_HOST/g" /etc/postfix/pgsql/mailboxes.cf
     sed -i "s/##DOVECOT_PGSQL_USER##/$DOVECOT_PGSQL_USER/g" /etc/postfix/pgsql/mailboxes.cf
