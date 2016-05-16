@@ -646,5 +646,6 @@ shlib_directory = /usr/lib/postfix
 smtpd_tls_cert_file=/private/ssl/ssl_certificate.pem
 smtpd_tls_key_file=/private/ssl/ssl_private_key.pem
 
-# spam/virus checking with Amavis
-content_filter = amavisfeed:[##AMAVIS_HOST##]:10024
+# spam/virus checking 
+#content_filter = amavisfeed:[##AMAVIS_HOST##]:10024
+content_filter = scan:[##CONTENT_FILTER_HOST##]:10025
