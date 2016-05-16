@@ -23,11 +23,8 @@ RUN 		apk add --update \
                 rm -rf /tmp/* && \
 		rm -rf /var/cache/apk/*
 
-#RUN		mkdir -p /etc/services.d/postfix
-
 EXPOSE		25 465 587 10025
 
-#RUN		mkdir /var/spool/mail
 RUN		mkdir -p /var/spool/mail/vhosts
 
 VOLUME		/var/spool/mail/vhosts
@@ -36,9 +33,8 @@ VOLUME		/etc/postfix
 
 #RUN		chown vmail:postdrop /var/spool/mail/vhosts
 
-ADD             postfix.run /etc/services.d/postfix/run
+#ADD             postfix.run /etc/services.d/postfix/run
 RUN             ln -s /bin/s6-true /etc/services.d/postfix/finish
-
 
 ADD 		conf/postfix /opt/postfix.default
 
