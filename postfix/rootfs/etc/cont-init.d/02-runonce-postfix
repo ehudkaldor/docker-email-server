@@ -1,5 +1,5 @@
 #!/usr/bin/with-contenv sh
-logutil-service -f /var/log/
+#logutil-service -f /var/log/
 
 # Environment variables
 export PGSQL_HOST 
