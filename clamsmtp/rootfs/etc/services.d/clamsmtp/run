@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+echo "Starting ClamSMTP daemon..."
+#s6-setuidgid clamav clamsmtpd
+exec clamsmtpd -d 4 2>&1

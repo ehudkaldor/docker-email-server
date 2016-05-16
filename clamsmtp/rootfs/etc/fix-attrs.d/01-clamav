@@ -1,0 +1,2 @@
+/run/clamav true clamav:clamav 0700 0700
+/var/lib/clamav true clamav:clamav
