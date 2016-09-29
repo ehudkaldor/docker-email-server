@@ -1,0 +1,12 @@
+#!/usr/bin/with-contenv sh
+
+# echo "Starting FreshClam deamon..."
+# freshclam --verbose --stdout --daemon 2>&1
+# freshclam --verbose --user=clamav 2>&1
+
+#echo "Starting FreshClam daemon..."
+#s6-setuidgid clamav freshclam --verbose --stdout --daemon
+
+echo "Starting Clam AntiVirus daemon..."
+#s6-setuidgid clamav clamd
+exec clamd 2>&1

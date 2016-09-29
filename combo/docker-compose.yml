@@ -1,0 +1,31 @@
+version: '2'
+services:
+  email-server:
+    domainname: connected.us.org
+    hostname: email
+    container_name: email-server
+    build: 
+      context: .
+    image: ehudkaldor/email-server
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+    environment:
+      - ADMIN_EMAIL=root@connected.us.org
+      - SMTP_DOMAIN=connected.us.org
+      - SMTP_HOSTNAME=email.connected.us.org
+      - DOVECOT_HOST=email.connected.us.org
+      - SPAMASSASSIN_HOST=email.connected.us.org
+      - CONTENT_FILTER_HOST=email.connected.us.org
+      - PGSQL_HOST=email.connected.us.org
+      - CLAM_HOST=email.connected.us.org
+      - POSTFIX_PGSQL_USER=mailreader
+      - POSTFIX_PGSQL_PASS=JJisCC
+      - POSTFIX_PGSQL_DB=mail
+      - DOVECOT_PGSQL_USER=dovecot
+      - DOVECOT_PGSQL_PASS=dovecot
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - '/var/lib/postgresql/data'
+

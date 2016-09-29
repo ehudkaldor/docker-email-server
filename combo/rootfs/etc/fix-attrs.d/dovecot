@@ -1,0 +1,3 @@
+#/etc/dovecot true mail:dovecot 0700 0700
+#/srv/mail true mail:mail
+

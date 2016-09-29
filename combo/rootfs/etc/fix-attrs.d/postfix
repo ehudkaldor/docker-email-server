@@ -1,0 +1,2 @@
+#/var/spool/mail/data true postfix 0700 0700
+/var/spool/mail/vhosts true vmail:postdrop 

@@ -1,0 +1,4 @@
+#/etc/postfix/transport
+connected.us.com      virtual:
+*                     :   #everything else go through relayhost rule
+

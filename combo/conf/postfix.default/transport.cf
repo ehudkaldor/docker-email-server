@@ -1,0 +1,8 @@
+user = ##POSTFIX_PGSQL_USER##
+password = ##POSTFIX_PGSQL_PASS##
+hosts = ##PGSQL_HOST##
+dbname = ##POSTFIX_PGSQL_DB##
+table = transport
+select_field = transport
+where_field = domain
+#query = SELECT destination FROM aliases WHERE source='%s'
