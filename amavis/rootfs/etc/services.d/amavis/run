@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv sh
+
+echo "Starting Amavis daemon..."
+s6-setuidgid amavis amavisd -c /etc/amavisd.conf
+#amavisd -c /etc/amavisd.conf

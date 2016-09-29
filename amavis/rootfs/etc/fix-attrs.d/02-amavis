@@ -1,0 +1,2 @@
+/etc/amavisd.conf false root:amavis 0744 0744
+/run/amavis true amavis:amavis 0700 0700

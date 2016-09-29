@@ -1,0 +1,43 @@
+#!/usr/bin/with-contenv sh
+
+echo "starting amavis setup"
+
+# Environment variables
+export AMAVIS_UID
+export AMAVIS_GID
+
+export AMAVIS_HOST
+export SMTP_DOMAIN
+
+export SKIP_AMAVIS_SETUP
+
+if [[ -f /private/vars.sh ]]; then
+    source /private/vars.sh
+fi
+
+SKIP_AMAVIS_SETUP=${SKIP_AMAVIS_SETUP:-}
+
+if [[ -z $SKIP_AMAVIS_SETUP ]]; then
+
+    SMTP_DOMAIN=${SMTP_DOMAIN:-}
+    if [[ -z ${SMTP_DOMAIN} ]]; then
+        echo "WARN: SMTP_DOMAIN not found. using default"
+        SMTP_DOMAIN=domain.com
+    fi
+    echo "SMTP_DOMAIN set to $SMTP_DOMAIN"
+
+    AMAVIS_HOST=${AMAVIS_HOST:-}
+    if [[ -z ${AMAVIS_HOST} ]]; then
+        echo "WARN: AMAVIS_HOST not found. using default"
+        AMAVIS_HOST=amavis.$SMTP_DOMAIN
+    fi
+    echo "AMAVIS_HOST set to $AMAVIS_HOST"
+
+    AMAVIS_UID=`id -u amavis`
+    AMAVIS_GUI=`id -g amavis`
+
+    sed -i "s/##SMTP_DOMAIN##/$SMTP_DOMAIN/g" /etc/amavisd.conf
+    sed -i "s/##AMAVIS_HOST##/$AMAVIS_HOST/g" /etc/amavisd.conf
+fi
+
+adduser clamav amavis

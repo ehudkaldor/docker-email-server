@@ -1,0 +1,7 @@
+#!/usr/bin/with-contenv sh
+
+echo "Running FreshClam to update definitions..."
+freshclam --verbose --stdout
+
+echo "Starting FreshClam daemon..."
+freshclam --verbose --stdout --daemon

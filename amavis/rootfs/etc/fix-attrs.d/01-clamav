@@ -1,0 +1,3 @@
+/etc/amavisd.conf false root:amavis 0744 0744
+/run/clamav true clamav:clamav 0700 0700
+/var/lib/clamav true clamav:clamav

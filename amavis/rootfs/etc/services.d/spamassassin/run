@@ -1,0 +1,6 @@
+#!/usr/bin/with-contenv sh
+
+sa-update -v
+
+echo "Starting SpamAssassing daemon..."
+exec spamd
