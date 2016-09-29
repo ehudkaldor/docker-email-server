@@ -23,22 +23,25 @@ RUN 		apk add --update \
                 rm -rf /tmp/* && \
 		rm -rf /var/cache/apk/*
 
-EXPOSE		25 465 587 10025
+EXPOSE		25 465 587 10026
 
 RUN		mkdir -p /var/spool/mail/vhosts
 
 VOLUME		/var/spool/mail/vhosts
 
-VOLUME		/etc/postfix
+#VOLUME		/etc/postfix
+
+
+ADD		rootfs /
 
 #RUN		chown vmail:postdrop /var/spool/mail/vhosts
 
 #ADD             postfix.run /etc/services.d/postfix/run
-RUN             ln -s /bin/s6-true /etc/services.d/postfix/finish
+RUN		ln -s /bin/s6-true /etc/services.d/postfix/finish
 
 ADD 		conf/postfix /opt/postfix.default
 
-ADD		rootfs /
+#ADD		rootfs /
 
 ADD		setup /initdb.d/
 
