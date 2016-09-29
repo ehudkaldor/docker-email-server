@@ -100,7 +100,7 @@ if [[ -z $SKIP_POSTFIX_SETUP ]]; then
 #    fi
 #    echo "SPAMASSASSIN_HOST set to $SPAMASSASSIN_HOST"
 
-    CONTENT_FILTER_HOST=${CLAMAV_HOST:-}
+    CONTENT_FILTER_HOST=${CONTENT_FILTER_HOST:-}
     if [[ -z ${CONTENT_FILTER_HOST} ]]; then
         echo "WARN: CONTENT_FILTER_HOST not found. using default"
         CONTENT_FILTER_HOST=filter.$SMTP_DOMAIN
